@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Adviti Academy Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --navy: #0D1B3E;
+  --navy-mid: #1A2A5E;
+  --navy-light: #243470;
+  --gold: #C9A84C;
+  --gold-light: #E8C96A;
+  --gold-pale: #FDF5E0;
+  --white: #FFFFFF;
+  --grey-100: #F5F6FA;
+  --grey-200: #E8EAF0;
+  --grey-400: #9BA3B8;
+  --grey-600: #5A6380;
+  --danger: #E53E3E;
+  --success: #2F855A;
+  --warn: #C05621;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 24px rgba(13,27,62,0.10);
+  --shadow-lg: 0 8px 40px rgba(13,27,62,0.18);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: var(--grey-100);
+  color: var(--navy);
+  min-height: 100vh;
+}
+
+/* ── LOGIN ── */
+#login-screen {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, var(--navy-light) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.login-card {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow-lg);
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-logo .owl { font-size: 56px; }
+
+.login-logo h1 {
+  font-family: 'Merriweather', serif;
+  font-size: 28px;
+  color: var(--navy);
+  margin: 8px 0 4px;
+}
+
+.login-logo p {
+  color: var(--gold);
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.form-group { margin-bottom: 18px; }
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--grey-600);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 13px 16px;
+  border: 2px solid var(--grey-200);
+  border-radius: var(--radius-sm);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 16px;
+  color: var(--navy);
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.form-group input:focus { border-color: var(--gold); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border-radius: var(--radius-sm);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--navy);
+  color: var(--white);
+  width: 100%;
+}
+
+.btn-primary:hover { background: var(--navy-light); transform: translateY(-1px); }
+
+.btn-gold {
+  background: var(--gold);
+  color: var(--navy);
+}
+
+.btn-gold:hover { background: var(--gold-light); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--navy);
+  border: 2px solid var(--grey-200);
+}
+
+.btn-outline:hover { border-color: var(--gold); }
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+
+.btn-sm { padding: 8px 16px; font-size: 13px; }
+
+.error-msg {
+  background: #FFF5F5;
+  color: var(--danger);
+  border: 1px solid #FED7D7;
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-size: 14px;
+  margin-bottom: 16px;
+  display: none;
+}
+
+/* ── APP SHELL ── */
+#app { display: none; min-height: 100vh; }
+
+.topbar {
+  background: var(--navy);
+  color: var(--white);
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(13,27,62,0.3);
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Merriweather', serif;
+  font-size: 18px;
+  color: var(--white);
+}
+
+.topbar-brand span { color: var(--gold); }
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.role-badge {
+  background: rgba(201,168,76,0.2);
+  color: var(--gold);
+  border: 1px solid rgba(201,168,76,0.4);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.user-name {
+  font-size: 14px;
+  color: var(--grey-400);
+}
+
+.logout-btn {
+  background: rgba(255,255,255,0.1);
+  color: var(--white);
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.logout-btn:hover { background: rgba(255,255,255,0.2); }
+
+/* ── NAV TABS ── */
+.nav-tabs {
+  background: var(--white);
+  border-bottom: 2px solid var(--grey-200);
+  padding: 0 24px;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.nav-tabs::-webkit-scrollbar { display: none; }
+
+.nav-tab {
+  padding: 16px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--grey-600);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.nav-tab:hover { color: var(--navy); }
+.nav-tab.active { color: var(--navy); border-bottom-color: var(--gold); }
+
+/* ── MAIN CONTENT ── */
+.main-content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-family: 'Merriweather', serif;
+  font-size: 18px;
+  color: var(--navy);
+}
+
+.section-title {
+  font-family: 'Merriweather', serif;
+  font-size: 22px;
+  color: var(--navy);
+  margin-bottom: 20px;
+}
+
+/* ── STAT CHIPS ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-chip {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.stat-chip .value {
+  font-family: 'Merriweather', serif;
+  font-size: 32px;
+  color: var(--navy);
+  font-weight: 900;
+}
+
+.stat-chip .label {
+  font-size: 12px;
+  color: var(--grey-600);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+.stat-chip.gold .value { color: var(--gold); }
+.stat-chip.success .value { color: var(--success); }
+.stat-chip.warn .value { color: var(--warn); }
+
+/* ── ASSIGNMENT CARDS ── */
+.assignment-list { display: flex; flex-direction: column; gap: 12px; }
+
+.assignment-item {
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--grey-200);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: box-shadow 0.2s;
+}
+
+.assignment-item:hover { box-shadow: var(--shadow); }
+
+.assignment-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.assignment-info { flex: 1; min-width: 0; }
+
+.assignment-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--navy);
+  margin-bottom: 4px;
+}
+
+.assignment-meta {
+  font-size: 13px;
+  color: var(--grey-600);
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.assignment-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ── STATUS BADGES ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.badge-pending { background: #FFF3CD; color: #856404; }
+.badge-submitted { background: #D1ECF1; color: #0C5460; }
+.badge-verified { background: #D4EDDA; color: var(--success); }
+.badge-redo { background: #F8D7DA; color: var(--danger); }
+.badge-overdue { background: #F8D7DA; color: var(--danger); }
+
+/* ── SUBJECT COLOURS ── */
+.subj-maths { background: #EEF2FF; color: #3730A3; }
+.subj-science { background: #ECFDF5; color: #065F46; }
+.subj-english { background: #FFF7ED; color: #9A3412; }
+.subj-social { background: #FDF4FF; color: #6B21A8; }
+.subj-hindi { background: #FFF1F2; color: #9F1239; }
+.subj-telugu { background: #FFFBEB; color: #92400E; }
+.subj-general { background: #F0F9FF; color: #075985; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(13,27,62,0.6);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 32px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-title {
+  font-family: 'Merriweather', serif;
+  font-size: 20px;
+  margin-bottom: 24px;
+  color: var(--navy);
+}
+
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--grey-200);
+}
+
+/* ── FORMS ── */
+.form-row { margin-bottom: 16px; }
+
+.form-row label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--grey-600);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 2px solid var(--grey-200);
+  border-radius: var(--radius-sm);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 15px;
+  color: var(--navy);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-row input:focus,
+.form-row select:focus,
+.form-row textarea:focus { border-color: var(--gold); }
+
+.form-row textarea { resize: vertical; min-height: 80px; }
+
+/* ── PROGRESS BAR ── */
+.progress-bar {
+  height: 8px;
+  background: var(--grey-200);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--grey-400);
+}
+
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { font-size: 15px; }
+
+/* ── TOAST ── */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--navy);
+  color: var(--white);
+  padding: 14px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 999;
+  max-width: 320px;
+}
+
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast.success { border-left: 4px solid var(--gold); }
+#toast.error { border-left: 4px solid var(--danger); }
+
+/* ── FILE UPLOAD ZONE ── */
+.upload-zone {
+  border: 2px dashed var(--grey-200);
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--grey-600);
+  font-size: 14px;
+}
+
+.upload-zone:hover { border-color: var(--gold); background: var(--gold-pale); }
+.upload-zone input { display: none; }
+
+
+
+/* ── TABLE ── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.data-table th {
+  background: var(--grey-100);
+  color: var(--grey-600);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  padding: 10px 16px;
+  text-align: left;
+  border-bottom: 2px solid var(--grey-200);
+}
+
+.data-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--grey-200);
+  vertical-align: middle;
+}
+
+.data-table tr:hover td { background: var(--grey-100); }
+
+/* ── GRID ── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+@media (max-width: 768px) {
+  .two-col { grid-template-columns: 1fr; }
+  .three-col { grid-template-columns: 1fr; }
+  .main-content { padding: 20px 16px; }
+  .login-card { padding: 32px 24px; }
+  .modal { padding: 24px; }
+  .assignment-item { flex-wrap: wrap; }
+  .topbar { padding: 0 16px; }
+  .topbar-brand { font-size: 15px; }
+  .user-name { display: none; }
+}
+
+/* ── TIMETABLE ── */
+.timetable-grid {
+  display: grid;
+  grid-template-columns: 100px repeat(7, 1fr);
+  gap: 4px;
+  font-size: 13px;
+}
+
+.tt-header {
+  background: var(--navy);
+  color: var(--white);
+  padding: 8px;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.tt-slot-label {
+  background: var(--grey-100);
+  padding: 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  color: var(--grey-600);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.tt-cell {
+  background: var(--white);
+  border: 1px solid var(--grey-200);
+  border-radius: 6px;
+  padding: 6px 8px;
+  min-height: 52px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 12px;
+  color: var(--navy);
+}
+
+.tt-cell:hover { border-color: var(--gold); background: var(--gold-pale); }
+.tt-cell.filled { background: var(--gold-pale); border-color: var(--gold); }
+
+@media (max-width: 768px) {
+  .timetable-grid {
+    grid-template-columns: 70px repeat(7, 1fr);
+    font-size: 11px;
+  }
+  .tt-cell { min-height: 40px; padding: 4px; }
+}
+
+/* ── PARENT SUMMARY ── */
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--grey-200);
+}
+
+.summary-row:last-child { border-bottom: none; }
+
+/* loading spinner */
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--grey-200);
+  border-top-color: var(--navy);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN ══════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="owl">🦉</div>
+      <h1>Adviti Academy Portal</h1>
+      <p>Academy Portal — Ignite · Learn · Grow</p>
+    </div>
+    <div class="error-msg" id="login-error"></div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="your@email.com" autocomplete="email"/>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"/>
+    </div>
+    <button class="btn btn-primary" id="login-btn">Sign In →</button>
+  </div>
+</div>
+
+<!-- ══════════ APP ══════════ -->
+<div id="app">
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-brand">🦉 <span>Adviti</span> Academy Portal</div>
+    <div class="topbar-right">
+      <span class="user-name" id="top-username"></span>
+      <span class="role-badge" id="top-role"></span>
+      <button class="logout-btn" id="logout-btn">Sign out</button>
+    </div>
+  </div>
+
+  <!-- Nav Tabs (rendered by JS per role) -->
+  <div class="nav-tabs" id="nav-tabs"></div>
+
+  <!-- Pages -->
+  <div class="main-content">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page" id="page-dashboard">
+      <h2 class="section-title" id="dash-greeting">Good morning 🌟</h2>
+      <div class="stats-grid" id="dash-stats"></div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📋 Due Soon</span>
+          </div>
+          <div id="dash-due-list"><div class="spinner"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">✅ Recent Submissions</span>
+          </div>
+          <div id="dash-recent-list"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ASSIGNMENTS (student view) ── -->
+    <div class="page" id="page-assignments">
+      <div class="card-header" style="margin-bottom:20px">
+        <h2 class="section-title" style="margin:0">📚 My Assignments</h2>
+        <select id="filter-subject-student" class="btn btn-outline btn-sm" style="cursor:pointer">
+          <option value="">All Subjects</option>
+          <option>Maths</option><option>Science</option><option>English</option>
+          <option>Social Studies</option><option>Hindi</option><option>Telugu</option>
+        </select>
+      </div>
+      <div id="student-assignments-list"><div class="spinner"></div></div>
+    </div>
+
+    <!-- ── MANAGE ASSIGNMENTS (tutor/mum) ── -->
+    <div class="page" id="page-manage-assignments">
+      <div class="card-header" style="margin-bottom:20px">
+        <h2 class="section-title" style="margin:0">📋 Assignments</h2>
+        <button class="btn btn-gold" id="new-assignment-btn">+ New Assignment</button>
+      </div>
+      <div class="card">
+        <div id="manage-assignments-table"><div class="spinner"></div></div>
+      </div>
+      <!-- Submissions inbox -->
+      <h2 class="section-title" style="margin-top:32px">📥 Submissions Inbox</h2>
+      <div class="card">
+        <div id="submissions-inbox"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- ── TESTS ── -->
+    <div class="page" id="page-tests">
+      <div class="card-header" style="margin-bottom:20px">
+        <h2 class="section-title" style="margin:0">📝 Tests & Exams</h2>
+        <button class="btn btn-gold" id="new-test-btn" style="display:none">+ Add Test</button>
+      </div>
+      <div id="tests-list"><div class="spinner"></div></div>
+    </div>
+
+    <!-- ── TIMETABLE ── -->
+    <div class="page" id="page-timetable">
+      <div class="card-header" style="margin-bottom:20px">
+        <h2 class="section-title" style="margin:0">📅 Weekly Timetable</h2>
+        <button class="btn btn-gold btn-sm" id="save-tt-btn">Save Timetable</button>
+      </div>
+      <div class="card" style="overflow-x:auto">
+        <div class="timetable-grid" id="timetable-grid"></div>
+      </div>
+    </div>
+
+    <!-- ── PROGRESS (parent/father) ── -->
+    <div class="page" id="page-progress">
+      <h2 class="section-title">📈 Adviti's Progress</h2>
+      <div class="stats-grid" id="progress-stats"></div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">Assignment Completion by Subject</div>
+        <div id="subject-progress"></div>
+      </div>
+      <div class="card" style="margin-top:20px">
+        <div class="card-title" style="margin-bottom:16px">All Submissions</div>
+        <div id="all-submissions-table"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- ── USERS (mum only) ── -->
+    <div class="page" id="page-users">
+      <h2 class="section-title">👥 Team Members</h2>
+      <div class="card">
+        <p style="color:var(--grey-600);font-size:14px;margin-bottom:16px">
+          Add your family and tutors below. They will receive an email to set their password.
+        </p>
+        <button class="btn btn-gold" id="invite-user-btn">+ Invite Person</button>
+        <div style="margin-top:20px" id="users-table"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /app -->
+
+<!-- ══════════ TOAST ══════════ -->
+<div id="toast"></div>
+
+<!-- ══════════ MODALS ══════════ -->
+
+<!-- New Assignment Modal -->
+<div class="modal-overlay" id="modal-assignment">
+  <div class="modal">
+    <div class="modal-title">📋 New Assignment</div>
+    <div class="form-row">
+      <label>Title</label>
+      <input type="text" id="a-title" placeholder="e.g. Real Numbers Worksheet"/>
+    </div>
+    <div class="form-row">
+      <label>Subject</label>
+      <select id="a-subject">
+        <option>Maths</option><option>Science</option><option>English</option>
+        <option>Social Studies</option><option>Hindi</option><option>Telugu</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Instructions</label>
+      <textarea id="a-instructions" placeholder="Describe what Adviti needs to do..."></textarea>
+    </div>
+    <div class="form-row">
+      <label>Deadline</label>
+      <input type="datetime-local" id="a-deadline"/>
+    </div>
+    <div class="form-row">
+      <label>Attachment (optional)</label>
+      <div class="upload-zone" onclick="document.getElementById('a-file').click()">
+        📎 Tap to attach a file (PDF, image, Word doc)
+        <input type="file" id="a-file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"/>
+      </div>
+      <div id="a-file-name" style="font-size:13px;color:var(--grey-600);margin-top:6px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-assignment')">Cancel</button>
+      <button class="btn btn-gold" id="save-assignment-btn">Save Assignment</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Test Modal -->
+<div class="modal-overlay" id="modal-test">
+  <div class="modal">
+    <div class="modal-title">📝 Add Test / Exam</div>
+    <div class="form-row">
+      <label>Test Title</label>
+      <input type="text" id="t-title" placeholder="e.g. FA-1 Maths"/>
+    </div>
+    <div class="form-row">
+      <label>Subject</label>
+      <select id="t-subject">
+        <option>Maths</option><option>Science</option><option>English</option>
+        <option>Social Studies</option><option>Hindi</option><option>Telugu</option><option>All Subjects</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Type</label>
+      <select id="t-type">
+        <option value="practice">Practice Test</option>
+        <option value="fa">Formative Assessment (FA)</option>
+        <option value="sa">Summative Assessment (SA)</option>
+        <option value="exam">Board Exam</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Scheduled Date</label>
+      <input type="date" id="t-date"/>
+    </div>
+    <div class="form-row">
+      <label>Instructions / Syllabus</label>
+      <textarea id="t-instructions" placeholder="Topics covered, what to prepare..."></textarea>
+    </div>
+    <div class="form-row">
+      <label>Attach Question Paper (optional)</label>
+      <div class="upload-zone" onclick="document.getElementById('t-file').click()">
+        📎 Upload question paper PDF or image
+        <input type="file" id="t-file" accept=".pdf,.jpg,.jpeg,.png"/>
+      </div>
+      <div id="t-file-name" style="font-size:13px;color:var(--grey-600);margin-top:6px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-test')">Cancel</button>
+      <button class="btn btn-gold" id="save-test-btn">Save Test</button>
+    </div>
+  </div>
+</div>
+
+<!-- Submit Assignment Modal -->
+<div class="modal-overlay" id="modal-submit">
+  <div class="modal">
+    <div class="modal-title">📤 Submit Assignment</div>
+    <div id="submit-assignment-info" style="background:var(--grey-100);border-radius:8px;padding:14px;margin-bottom:16px;font-size:14px;color:var(--navy)"></div>
+    <div class="form-row">
+      <label>Your Submission</label>
+      <div class="upload-zone" onclick="document.getElementById('s-file').click()">
+        📸 Take a photo or upload your work (PDF, image)
+        <input type="file" id="s-file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" capture="environment"/>
+      </div>
+      <div id="s-file-name" style="font-size:13px;color:var(--grey-600);margin-top:6px"></div>
+    </div>
+    <div class="form-row">
+      <label>Notes (optional)</label>
+      <textarea id="s-notes" placeholder="Anything you want to add..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-submit')">Cancel</button>
+      <button class="btn btn-gold" id="do-submit-btn">Submit ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- Verify Submission Modal -->
+<div class="modal-overlay" id="modal-verify">
+  <div class="modal">
+    <div class="modal-title">✅ Review Submission</div>
+    <div id="verify-info" style="background:var(--grey-100);border-radius:8px;padding:14px;margin-bottom:16px;font-size:14px"></div>
+    <div class="form-row">
+      <label>Feedback for Adviti</label>
+      <textarea id="v-feedback" placeholder="Well done! / Please redo this section..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-verify')">Cancel</button>
+      <button class="btn btn-danger btn-sm" id="redo-btn">Ask to Redo 🔄</button>
+      <button class="btn btn-gold" id="verify-btn">Mark Verified ✅</button>
+    </div>
+  </div>
+</div>
+
+<!-- Invite User Modal -->
+<div class="modal-overlay" id="modal-invite">
+  <div class="modal">
+    <div class="modal-title">👤 Invite Person</div>
+    <div class="form-row">
+      <label>Full Name</label>
+      <input type="text" id="inv-name" placeholder="e.g. Gattu"/>
+    </div>
+    <div class="form-row">
+      <label>Email</label>
+      <input type="email" id="inv-email" placeholder="their@email.com"/>
+    </div>
+    <div class="form-row">
+      <label>Role</label>
+      <select id="inv-role">
+        <option value="parent">Parent (Mum)</option>
+        <option value="father">Father</option>
+        <option value="hindi_tutor">Hindi Tutor</option>
+        <option value="tutor">General Tutor</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Temporary Password</label>
+      <input type="text" id="inv-pass" placeholder="They can change it later"/>
+    </div>
+    <p style="font-size:13px;color:var(--grey-600);margin-top:8px">
+      ℹ️ After creating the account, share the email + temporary password with them. They can sign in immediately.
+    </p>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-invite')">Cancel</button>
+      <button class="btn btn-gold" id="create-user-btn">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// SUPABASE INIT
+// ══════════════════════════════════════════
+const { createClient } = supabase;
+const sb = createClient(
+  'https://ggzbdgroihwqzfbyrddk.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdnemJkZ3JvaWh3cXpmYnlyZGRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2ODQ3MTcsImV4cCI6MjA5NzI2MDcxN30.Ib2IGeBaMMDhBlpFumwpS_956XTL6Pahjhqv806qbms'
+);
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let currentUser = null;
+let userProfile = null;
+let currentSubmitAssignmentId = null;
+let currentVerifySubmissionId = null;
+let botMessages = [];
+
+// ══════════════════════════════════════════
+// ROLE CONFIG
+// ══════════════════════════════════════════
+const ROLE_CONFIG = {
+  student: {
+    label: 'Student',
+    tabs: [
+      { id: 'dashboard', label: '🏠 Home' },
+      { id: 'assignments', label: '📚 My Assignments' },
+      { id: 'tests', label: '📝 Tests' },
+      { id: 'timetable', label: '📅 Timetable' },
+    ],
+    showBot: false,
+  },
+  parent: {
+    label: 'Parent',
+    tabs: [
+      { id: 'dashboard', label: '🏠 Overview' },
+      { id: 'manage-assignments', label: '📋 Assignments' },
+      { id: 'tests', label: '📝 Tests' },
+      { id: 'timetable', label: '📅 Timetable' },
+      { id: 'progress', label: '📈 Progress' },
+      { id: 'users', label: '👥 Team' },
+    ],
+    showBot: false,
+  },
+  father: {
+    label: 'Father',
+    tabs: [
+      { id: 'dashboard', label: '🏠 Summary' },
+      { id: 'progress', label: '📈 Progress' },
+      { id: 'timetable', label: '📅 Timetable' },
+    ],
+    showBot: false,
+  },
+  hindi_tutor: {
+    label: 'Hindi Tutor',
+    tabs: [
+      { id: 'dashboard', label: '🏠 Home' },
+      { id: 'manage-assignments', label: '📋 Assignments' },
+      { id: 'tests', label: '📝 Tests' },
+    ],
+    showBot: false,
+  },
+  tutor: {
+    label: 'Tutor',
+    tabs: [
+      { id: 'dashboard', label: '🏠 Home' },
+      { id: 'manage-assignments', label: '📋 Assignments' },
+      { id: 'tests', label: '📝 Tests' },
+      { id: 'timetable', label: '📅 Timetable' },
+    ],
+    showBot: false,
+  },
+};
+
+const SUBJECT_ICONS = {
+  Maths: '➕', Science: '🔬', English: '📖', 'Social Studies': '🌍',
+  Hindi: '🇮🇳', Telugu: '🌸', 'All Subjects': '📚', General: '📚'
+};
+
+const SUBJECT_CLASS = {
+  Maths: 'subj-maths', Science: 'subj-science', English: 'subj-english',
+  'Social Studies': 'subj-social', Hindi: 'subj-hindi', Telugu: 'subj-telugu',
+  'All Subjects': 'subj-general', General: 'subj-general'
+};
+
+// ══════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════
+document.getElementById('login-btn').onclick = async () => {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+
+  if (!email || !pass) { showErr('Please enter your email and password.'); return; }
+
+  const btn = document.getElementById('login-btn');
+  btn.textContent = 'Signing in...';
+  btn.disabled = true;
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+
+  if (error) {
+    showErr(error.message);
+    btn.textContent = 'Sign In →';
+    btn.disabled = false;
+    return;
+  }
+
+  await initApp(data.user);
+};
+
+document.getElementById('login-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('login-btn').click();
+});
+
+document.getElementById('logout-btn').onclick = async () => {
+  await sb.auth.signOut();
+  location.reload();
+};
+
+function showErr(msg) {
+  const el = document.getElementById('login-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// Check existing session
+sb.auth.getSession().then(({ data: { session } }) => {
+  if (session) initApp(session.user);
+});
+
+// ══════════════════════════════════════════
+// APP INIT
+// ══════════════════════════════════════════
+async function initApp(user) {
+  currentUser = user;
+
+  // Fetch profile
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
+  userProfile = profile || { role: 'student', name: user.email };
+
+  // Show app
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+
+  // Set topbar
+  document.getElementById('top-username').textContent = userProfile.name || '';
+  const roleConf = ROLE_CONFIG[userProfile.role] || ROLE_CONFIG.student;
+  document.getElementById('top-role').textContent = roleConf.label;
+
+  // Build nav
+  buildNav(roleConf.tabs);
+
+  // Show bot for student
+  
+
+  // Show test button for tutors/parent
+  if (['parent','tutor','hindi_tutor'].includes(userProfile.role)) {
+    document.getElementById('new-test-btn').style.display = 'inline-flex';
+  }
+
+  // Show first tab
+  activateTab(roleConf.tabs[0].id);
+}
+
+// ══════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════
+function buildNav(tabs) {
+  const nav = document.getElementById('nav-tabs');
+  nav.innerHTML = '';
+  tabs.forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'nav-tab';
+    el.textContent = t.label;
+    el.dataset.page = t.id;
+    el.onclick = () => activateTab(t.id);
+    nav.appendChild(el);
+  });
+}
+
+function activateTab(id) {
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.page === id);
+  });
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.toggle('active', p.id === 'page-' + id);
+  });
+  loadPage(id);
+}
+
+// ══════════════════════════════════════════
+// PAGE LOADERS
+// ══════════════════════════════════════════
+async function loadPage(id) {
+  if (id === 'dashboard') loadDashboard();
+  if (id === 'assignments') loadStudentAssignments();
+  if (id === 'manage-assignments') loadManageAssignments();
+  if (id === 'tests') loadTests();
+  if (id === 'timetable') loadTimetable();
+  if (id === 'progress') loadProgress();
+  if (id === 'users') loadUsers();
+}
+
+// ── DASHBOARD ──
+async function loadDashboard() {
+  const role = userProfile.role;
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const name = userProfile.name ? ` ${userProfile.name.split(' ')[0]}` : '';
+  document.getElementById('dash-greeting').textContent = `${greet}${name} 🌟`;
+
+  // Fetch assignments relevant to this role
+  let query = sb.from('assignments').select('*').order('deadline', { ascending: true });
+  if (role === 'hindi_tutor') query = query.eq('subject', 'Hindi');
+
+  const { data: assignments } = await query;
+  const { data: submissions } = await sb.from('submissions').select('*, assignments(title,subject)').order('submitted_at', { ascending: false }).limit(5);
+
+  const pending = (assignments || []).filter(a => {
+    if (role === 'student') {
+      const sub = (submissions || []).find(s => s.assignment_id === a.id);
+      return !sub || sub.status === 'redo';
+    }
+    return true;
+  });
+
+  const overdue = pending.filter(a => a.deadline && new Date(a.deadline) < new Date());
+
+  document.getElementById('dash-stats').innerHTML = `
+    <div class="stat-chip">
+      <div class="value">${(assignments||[]).length}</div>
+      <div class="label">Total Assignments</div>
+    </div>
+    <div class="stat-chip warn">
+      <div class="value">${pending.length}</div>
+      <div class="label">Pending</div>
+    </div>
+    <div class="stat-chip ${overdue.length>0?'warn':'success'}">
+      <div class="value">${overdue.length}</div>
+      <div class="label">Overdue</div>
+    </div>
+    <div class="stat-chip success">
+      <div class="value">${(submissions||[]).filter(s=>s.status==='verified').length}</div>
+      <div class="label">Verified ✅</div>
+    </div>
+  `;
+
+  // Due soon
+  const dueEl = document.getElementById('dash-due-list');
+  const dueSoon = (assignments||[]).filter(a => a.deadline).slice(0,5);
+  if (!dueSoon.length) {
+    dueEl.innerHTML = '<div class="empty-state"><div class="icon">🎉</div><p>Nothing due soon!</p></div>';
+  } else {
+    dueEl.innerHTML = dueSoon.map(a => `
+      <div class="summary-row">
+        <div>
+          <span class="badge ${SUBJECT_CLASS[a.subject]||'subj-general'}">${SUBJECT_ICONS[a.subject]||'📚'} ${a.subject}</span>
+          <div style="font-weight:600;margin-top:4px;font-size:14px">${esc(a.title)}</div>
+        </div>
+        <div style="font-size:12px;color:var(--grey-600);text-align:right">
+          ${a.deadline ? formatDate(a.deadline) : 'No deadline'}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Recent submissions
+  const recEl = document.getElementById('dash-recent-list');
+  if (!(submissions||[]).length) {
+    recEl.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>No submissions yet</p></div>';
+  } else {
+    recEl.innerHTML = submissions.map(s => `
+      <div class="summary-row">
+        <div style="font-size:14px;font-weight:600">${esc(s.assignments?.title||'Assignment')}</div>
+        <span class="badge badge-${s.status}">${s.status}</span>
+      </div>
+    `).join('');
+  }
+}
+
+// ── STUDENT ASSIGNMENTS ──
+async function loadStudentAssignments() {
+  const { data: assignments } = await sb.from('assignments').select('*').order('deadline', { ascending: true });
+  const { data: submissions } = await sb.from('submissions').select('*').eq('submitted_by', currentUser.id);
+
+  const subMap = {};
+  (submissions||[]).forEach(s => subMap[s.assignment_id] = s);
+
+  const el = document.getElementById('student-assignments-list');
+  if (!(assignments||[]).length) {
+    el.innerHTML = '<div class="empty-state"><div class="icon">🎉</div><p>No assignments yet — check back soon!</p></div>';
+    return;
+  }
+
+  el.innerHTML = '<div class="assignment-list">' + assignments.map(a => {
+    const sub = subMap[a.id];
+    const status = sub ? sub.status : 'pending';
+    const isOverdue = a.deadline && new Date(a.deadline) < new Date() && status === 'pending';
+    return `
+      <div class="assignment-item">
+        <div class="assignment-icon ${SUBJECT_CLASS[a.subject]||'subj-general'}">${SUBJECT_ICONS[a.subject]||'📚'}</div>
+        <div class="assignment-info">
+          <div class="assignment-title">${esc(a.title)}</div>
+          <div class="assignment-meta">
+            <span>${a.subject}</span>
+            ${a.deadline ? `<span>📅 Due ${formatDate(a.deadline)}</span>` : ''}
+            ${a.instructions ? `<span title="${esc(a.instructions)}">📄 Has instructions</span>` : ''}
+          </div>
+          ${sub?.feedback ? `<div style="margin-top:6px;font-size:13px;color:var(--warn);background:#FFF3CD;padding:6px 10px;border-radius:6px">💬 ${esc(sub.feedback)}</div>` : ''}
+        </div>
+        <div class="assignment-actions">
+          <span class="badge badge-${isOverdue?'overdue':status}">${isOverdue?'overdue':status}</span>
+          ${a.file_url ? `<a href="${a.file_url}" target="_blank" class="btn btn-outline btn-sm">📎 View</a>` : ''}
+          ${status !== 'verified' ? `<button class="btn btn-gold btn-sm" onclick="openSubmit('${a.id}','${esc(a.title)}','${esc(a.subject)}')">Submit →</button>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('') + '</div>';
+}
+
+// ── MANAGE ASSIGNMENTS ──
+async function loadManageAssignments() {
+  let query = sb.from('assignments').select('*').order('created_at', { ascending: false });
+  if (userProfile.role === 'hindi_tutor') query = query.eq('subject', 'Hindi');
+
+  const { data: assignments } = await query;
+
+  const tableEl = document.getElementById('manage-assignments-table');
+  if (!(assignments||[]).length) {
+    tableEl.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>No assignments yet. Create one!</p></div>';
+  } else {
+    tableEl.innerHTML = `
+      <table class="data-table">
+        <thead><tr>
+          <th>Title</th><th>Subject</th><th>Deadline</th><th>Actions</th>
+        </tr></thead>
+        <tbody>
+          ${assignments.map(a => `
+            <tr>
+              <td><strong>${esc(a.title)}</strong>${a.instructions?`<br><span style="font-size:12px;color:var(--grey-600)">${esc(a.instructions.substring(0,60))}...</span>`:''}</td>
+              <td><span class="badge ${SUBJECT_CLASS[a.subject]||'subj-general'}">${a.subject}</span></td>
+              <td>${a.deadline ? formatDate(a.deadline) : '—'}</td>
+              <td>
+                ${a.file_url ? `<a href="${a.file_url}" target="_blank" class="btn btn-outline btn-sm">📎</a>` : ''}
+                <button class="btn btn-danger btn-sm" onclick="deleteAssignment('${a.id}')">Delete</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  // Load submissions inbox
+  const { data: submissions } = await sb.from('submissions')
+    .select('*, assignments(title,subject)')
+    .eq('status', 'submitted')
+    .order('submitted_at', { ascending: false });
+
+  const inboxEl = document.getElementById('submissions-inbox');
+  if (!(submissions||[]).length) {
+    inboxEl.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>No pending submissions to review</p></div>';
+  } else {
+    inboxEl.innerHTML = `
+      <table class="data-table">
+        <thead><tr><th>Assignment</th><th>Subject</th><th>Submitted</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${submissions.map(s => `
+            <tr>
+              <td><strong>${esc(s.assignments?.title||'')}</strong>${s.notes?`<br><span style="font-size:12px;color:var(--grey-600)">${esc(s.notes)}</span>`:''}</td>
+              <td><span class="badge ${SUBJECT_CLASS[s.assignments?.subject]||'subj-general'}">${s.assignments?.subject||''}</span></td>
+              <td style="font-size:13px">${formatDate(s.submitted_at)}</td>
+              <td style="display:flex;gap:8px;flex-wrap:wrap">
+                ${s.file_url ? `<a href="${s.file_url}" target="_blank" class="btn btn-outline btn-sm">📎 View Work</a>` : ''}
+                <button class="btn btn-gold btn-sm" onclick="openVerify('${s.id}','${esc(s.assignments?.title||'')}')">Review →</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+}
+
+// ── TESTS ──
+async function loadTests() {
+  let query = sb.from('tests').select('*').order('test_date', { ascending: true });
+  if (userProfile.role === 'hindi_tutor') query = query.eq('subject', 'Hindi');
+
+  const { data: tests } = await query;
+  const el = document.getElementById('tests-list');
+
+  if (!(tests||[]).length) {
+    el.innerHTML = '<div class="empty-state"><div class="icon">📝</div><p>No tests added yet</p></div>';
+    return;
+  }
+
+  const typeLabels = { practice:'Practice Test', fa:'Formative Assessment', sa:'Summative Assessment', exam:'Board Exam' };
+  const typeColors = { practice:'subj-general', fa:'subj-maths', sa:'subj-social', exam:'subj-hindi' };
+
+  el.innerHTML = '<div class="assignment-list">' + tests.map(t => `
+    <div class="assignment-item">
+      <div class="assignment-icon ${SUBJECT_CLASS[t.subject]||'subj-general'}">${SUBJECT_ICONS[t.subject]||'📝'}</div>
+      <div class="assignment-info">
+        <div class="assignment-title">${esc(t.title)}</div>
+        <div class="assignment-meta">
+          <span>${t.subject}</span>
+          <span class="badge ${typeColors[t.type]||'subj-general'}">${typeLabels[t.type]||t.type}</span>
+          ${t.test_date ? `<span>📅 ${formatDate(t.test_date)}</span>` : ''}
+        </div>
+        ${t.instructions ? `<div style="margin-top:6px;font-size:13px;color:var(--grey-600)">${esc(t.instructions)}</div>` : ''}
+      </div>
+      <div class="assignment-actions">
+        ${t.file_url ? `<a href="${t.file_url}" target="_blank" class="btn btn-gold btn-sm">📎 Paper</a>` : ''}
+        ${['parent','tutor','hindi_tutor'].includes(userProfile.role) ? `<button class="btn btn-danger btn-sm" onclick="deleteTest('${t.id}')">Delete</button>` : ''}
+      </div>
+    </div>
+  `).join('') + '</div>';
+}
+
+// ── TIMETABLE ──
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const SLOTS = ['Morning\n8–10 AM','Afternoon\n2–4 PM','Evening\n6–8 PM'];
+let ttData = {};
+
+function loadTimetable() {
+  const saved = localStorage.getItem('adviti_timetable');
+  ttData = saved ? JSON.parse(saved) : {};
+
+  const grid = document.getElementById('timetable-grid');
+  const canEdit = ['parent','student'].includes(userProfile.role);
+
+  // Header row
+  let html = '<div class="tt-header" style="background:transparent"></div>';
+  DAYS.forEach(d => html += `<div class="tt-header">${d}</div>`);
+
+  SLOTS.forEach((slot, si) => {
+    html += `<div class="tt-slot-label">${slot.replace('\n','<br>')}</div>`;
+    DAYS.forEach((day, di) => {
+      const key = `${di}-${si}`;
+      const val = ttData[key] || '';
+      html += `<div class="tt-cell ${val?'filled':''}" 
+        ${canEdit ? `onclick="editTTCell('${key}',this)"` : ''}
+        title="${val||'Click to add'}">${esc(val)}</div>`;
+    });
+  });
+
+  grid.innerHTML = html;
+  document.getElementById('save-tt-btn').style.display = canEdit ? 'inline-flex' : 'none';
+}
+
+function editTTCell(key, el) {
+  const current = ttData[key] || '';
+  const val = prompt('What goes in this slot? (leave blank to clear)', current);
+  if (val === null) return;
+  ttData[key] = val.trim();
+  el.textContent = val.trim();
+  el.classList.toggle('filled', !!val.trim());
+}
+
+document.getElementById('save-tt-btn').onclick = () => {
+  localStorage.setItem('adviti_timetable', JSON.stringify(ttData));
+  toast('Timetable saved! ✅', 'success');
+};
+
+// ── PROGRESS ──
+async function loadProgress() {
+  const { data: assignments } = await sb.from('assignments').select('*');
+  const { data: submissions } = await sb.from('submissions').select('*');
+
+  const total = (assignments||[]).length;
+  const submitted = (submissions||[]).filter(s=>s.status !== 'pending').length;
+  const verified = (submissions||[]).filter(s=>s.status==='verified').length;
+  const pending = total - submitted;
+
+  document.getElementById('progress-stats').innerHTML = `
+    <div class="stat-chip"><div class="value">${total}</div><div class="label">Assignments Set</div></div>
+    <div class="stat-chip gold"><div class="value">${submitted}</div><div class="label">Submitted</div></div>
+    <div class="stat-chip success"><div class="value">${verified}</div><div class="label">Verified</div></div>
+    <div class="stat-chip warn"><div class="value">${pending}</div><div class="label">Pending</div></div>
+  `;
+
+  // Per-subject breakdown
+  const subjects = ['Maths','Science','English','Social Studies','Hindi','Telugu'];
+  const subEl = document.getElementById('subject-progress');
+  subEl.innerHTML = subjects.map(subj => {
+    const subjA = (assignments||[]).filter(a=>a.subject===subj);
+    const subjS = (submissions||[]).filter(s => subjA.find(a=>a.id===s.assignment_id) && s.status==='verified');
+    const pct = subjA.length ? Math.round((subjS.length/subjA.length)*100) : 0;
+    return `
+      <div style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px">
+          <span>${SUBJECT_ICONS[subj]} ${subj}</span>
+          <span style="color:var(--grey-600)">${subjS.length}/${subjA.length} verified</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      </div>
+    `;
+  }).join('');
+
+  // All submissions table
+  const { data: allSubs } = await sb.from('submissions')
+    .select('*, assignments(title,subject)')
+    .order('submitted_at', { ascending: false });
+
+  const tableEl = document.getElementById('all-submissions-table');
+  if (!(allSubs||[]).length) {
+    tableEl.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>No submissions yet</p></div>';
+  } else {
+    tableEl.innerHTML = `
+      <table class="data-table">
+        <thead><tr><th>Assignment</th><th>Subject</th><th>Submitted</th><th>Status</th></tr></thead>
+        <tbody>
+          ${allSubs.map(s=>`
+            <tr>
+              <td><strong>${esc(s.assignments?.title||'')}</strong></td>
+              <td>${s.assignments?.subject||''}</td>
+              <td style="font-size:13px">${formatDate(s.submitted_at)}</td>
+              <td><span class="badge badge-${s.status}">${s.status}</span></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+}
+
+// ── USERS ──
+async function loadUsers() {
+  const { data: profiles } = await sb.from('profiles').select('*');
+  const el = document.getElementById('users-table');
+  if (!(profiles||[]).length) {
+    el.innerHTML = '<div class="empty-state"><div class="icon">👥</div><p>No team members yet</p></div>';
+    return;
+  }
+  const roleLabels = { student:'Student', parent:'Parent', father:'Father', hindi_tutor:'Hindi Tutor', tutor:'Tutor' };
+  el.innerHTML = `
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead>
+      <tbody>
+        ${profiles.map(p=>`
+          <tr>
+            <td><strong>${esc(p.name||'—')}</strong></td>
+            <td style="font-size:13px;color:var(--grey-600)">${esc(p.email||'')}</td>
+            <td><span class="badge subj-general">${roleLabels[p.role]||p.role}</span></td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+// ══════════════════════════════════════════
+// ASSIGNMENT ACTIONS
+// ══════════════════════════════════════════
+document.getElementById('new-assignment-btn').onclick = () => openModal('modal-assignment');
+
+document.getElementById('a-file').onchange = e => {
+  const f = e.target.files[0];
+  document.getElementById('a-file-name').textContent = f ? `📎 ${f.name}` : '';
+};
+
+document.getElementById('save-assignment-btn').onclick = async () => {
+  const title = document.getElementById('a-title').value.trim();
+  const subject = document.getElementById('a-subject').value;
+  const instructions = document.getElementById('a-instructions').value.trim();
+  const deadline = document.getElementById('a-deadline').value;
+
+  if (!title) { toast('Please enter a title', 'error'); return; }
+
+  const btn = document.getElementById('save-assignment-btn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+
+  let fileUrl = null;
+  const file = document.getElementById('a-file').files[0];
+  if (file) fileUrl = await uploadFile(file, 'assignments');
+
+  const { error } = await sb.from('assignments').insert({
+    title, subject, instructions, deadline: deadline || null,
+    file_url: fileUrl, created_by: currentUser.id
+  });
+
+  btn.textContent = 'Save Assignment'; btn.disabled = false;
+
+  if (error) { toast('Error: ' + error.message, 'error'); return; }
+
+  toast('Assignment created! ✅', 'success');
+  closeModal('modal-assignment');
+  document.getElementById('a-title').value = '';
+  document.getElementById('a-instructions').value = '';
+  document.getElementById('a-deadline').value = '';
+  document.getElementById('a-file').value = '';
+  document.getElementById('a-file-name').textContent = '';
+  loadManageAssignments();
+};
+
+async function deleteAssignment(id) {
+  if (!confirm('Delete this assignment?')) return;
+  await sb.from('assignments').delete().eq('id', id);
+  toast('Assignment deleted', 'success');
+  loadManageAssignments();
+}
+
+// ══════════════════════════════════════════
+// SUBMIT ASSIGNMENT
+// ══════════════════════════════════════════
+function openSubmit(id, title, subject) {
+  currentSubmitAssignmentId = id;
+  document.getElementById('submit-assignment-info').innerHTML =
+    `<strong>${esc(title)}</strong><br><span style="color:var(--grey-600)">${esc(subject)}</span>`;
+  document.getElementById('s-notes').value = '';
+  document.getElementById('s-file').value = '';
+  document.getElementById('s-file-name').textContent = '';
+  openModal('modal-submit');
+}
+
+document.getElementById('s-file').onchange = e => {
+  const f = e.target.files[0];
+  document.getElementById('s-file-name').textContent = f ? `📎 ${f.name}` : '';
+};
+
+document.getElementById('do-submit-btn').onclick = async () => {
+  const file = document.getElementById('s-file').files[0];
+  const notes = document.getElementById('s-notes').value.trim();
+
+  if (!file && !notes) { toast('Please attach your work or add a note', 'error'); return; }
+
+  const btn = document.getElementById('do-submit-btn');
+  btn.textContent = 'Submitting...'; btn.disabled = true;
+
+  let fileUrl = null;
+  if (file) fileUrl = await uploadFile(file, 'submissions');
+
+  // Check if already submitted (redo case)
+  const { data: existing } = await sb.from('submissions')
+    .select('id').eq('assignment_id', currentSubmitAssignmentId).eq('submitted_by', currentUser.id).single();
+
+  if (existing) {
+    await sb.from('submissions').update({
+      file_url: fileUrl, notes, status: 'submitted', submitted_at: new Date().toISOString(), feedback: null
+    }).eq('id', existing.id);
+  } else {
+    await sb.from('submissions').insert({
+      assignment_id: currentSubmitAssignmentId,
+      submitted_by: currentUser.id,
+      file_url: fileUrl, notes, status: 'submitted'
+    });
+  }
+
+  btn.textContent = 'Submit ✓'; btn.disabled = false;
+  toast('Submitted! Your tutor will review it soon 🎉', 'success');
+  closeModal('modal-submit');
+  loadStudentAssignments();
+};
+
+// ══════════════════════════════════════════
+// VERIFY SUBMISSION
+// ══════════════════════════════════════════
+function openVerify(id, title) {
+  currentVerifySubmissionId = id;
+  document.getElementById('verify-info').innerHTML = `Reviewing submission for: <strong>${esc(title)}</strong>`;
+  document.getElementById('v-feedback').value = '';
+  openModal('modal-verify');
+}
+
+async function updateSubmissionStatus(status) {
+  const feedback = document.getElementById('v-feedback').value.trim();
+  await sb.from('submissions').update({ status, feedback, verified_at: new Date().toISOString() })
+    .eq('id', currentVerifySubmissionId);
+  toast(status === 'verified' ? 'Marked as verified ✅' : 'Sent back for redo 🔄', 'success');
+  closeModal('modal-verify');
+  loadManageAssignments();
+}
+
+document.getElementById('verify-btn').onclick = () => updateSubmissionStatus('verified');
+document.getElementById('redo-btn').onclick = () => updateSubmissionStatus('redo');
+
+// ══════════════════════════════════════════
+// TESTS ACTIONS
+// ══════════════════════════════════════════
+document.getElementById('new-test-btn').onclick = () => openModal('modal-test');
+
+document.getElementById('t-file').onchange = e => {
+  const f = e.target.files[0];
+  document.getElementById('t-file-name').textContent = f ? `📎 ${f.name}` : '';
+};
+
+document.getElementById('save-test-btn').onclick = async () => {
+  const title = document.getElementById('t-title').value.trim();
+  const subject = document.getElementById('t-subject').value;
+  const type = document.getElementById('t-type').value;
+  const testDate = document.getElementById('t-date').value;
+  const instructions = document.getElementById('t-instructions').value.trim();
+
+  if (!title) { toast('Please enter a test title', 'error'); return; }
+
+  const btn = document.getElementById('save-test-btn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+
+  let fileUrl = null;
+  const file = document.getElementById('t-file').files[0];
+  if (file) fileUrl = await uploadFile(file, 'tests');
+
+  const { error } = await sb.from('tests').insert({
+    title, subject, type, test_date: testDate || null,
+    instructions, file_url: fileUrl, created_by: currentUser.id
+  });
+
+  btn.textContent = 'Save Test'; btn.disabled = false;
+  if (error) { toast('Error: ' + error.message, 'error'); return; }
+
+  toast('Test added! 📝', 'success');
+  closeModal('modal-test');
+  document.getElementById('t-title').value = '';
+  document.getElementById('t-instructions').value = '';
+  document.getElementById('t-file').value = '';
+  document.getElementById('t-file-name').textContent = '';
+  loadTests();
+};
+
+async function deleteTest(id) {
+  if (!confirm('Delete this test?')) return;
+  await sb.from('tests').delete().eq('id', id);
+  toast('Test deleted', 'success');
+  loadTests();
+}
+
+// ══════════════════════════════════════════
+// INVITE USER
+// ══════════════════════════════════════════
+document.getElementById('invite-user-btn').onclick = () => openModal('modal-invite');
+
+document.getElementById('create-user-btn').onclick = async () => {
+  const name = document.getElementById('inv-name').value.trim();
+  const email = document.getElementById('inv-email').value.trim();
+  const role = document.getElementById('inv-role').value;
+  const pass = document.getElementById('inv-pass').value.trim();
+
+  if (!name || !email || !pass) { toast('Please fill all fields', 'error'); return; }
+
+  const btn = document.getElementById('create-user-btn');
+  btn.textContent = 'Creating...'; btn.disabled = true;
+
+  // We use signUp — the user can log in immediately with these credentials
+  const { data, error } = await sb.auth.signUp({ email, password: pass });
+
+  if (error) {
+    toast('Error: ' + error.message, 'error');
+    btn.textContent = 'Create Account'; btn.disabled = false;
+    return;
+  }
+
+  if (data.user) {
+    // Insert profile
+    await sb.from('profiles').upsert({
+      id: data.user.id, name, email, role
+    });
+  }
+
+  btn.textContent = 'Create Account'; btn.disabled = false;
+  toast(`${name} added! Share their login details with them.`, 'success');
+  closeModal('modal-invite');
+  document.getElementById('inv-name').value = '';
+  document.getElementById('inv-email').value = '';
+  document.getElementById('inv-pass').value = '';
+  loadUsers();
+};
+
+// ══════════════════════════════════════════
+// FILE UPLOAD
+// ══════════════════════════════════════════
+async function uploadFile(file, bucket) {
+  const ext = file.name.split('.').pop();
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  const { data, error } = await sb.storage.from(bucket).upload(path, file, { upsert: false });
+  if (error) { toast('Upload error: ' + error.message, 'error'); return null; }
+  const { data: url } = sb.storage.from(bucket).getPublicUrl(path);
+  return url.publicUrl;
+}
+
+// ══════════════════════════════════════════
+// BOT
+// ══════════════════════════════════════════
+
+
+async function sendBot() {
+  const input = document.getElementById('bot-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  botMessages.push({ role: 'user', content: msg });
+  renderBotMessages();
+
+  const res = await fetch('/.netlify/functions/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages: botMessages })
+  });
+  const d = await res.json();
+  botMessages.push({ role: 'assistant', content: d.reply });
+  renderBotMessages();
+}
+
+function renderBotMessages() {
+  const el = document.getElementById('bot-messages');
+  el.innerHTML = botMessages.map(m =>
+    `<div class="bot-msg ${m.role==='user'?'user':'bot'}">${esc(m.content)}</div>`
+  ).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+// ══════════════════════════════════════════
+// MODAL HELPERS
+// ══════════════════════════════════════════
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Close modal on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// ══════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════
+function toast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `show ${type}`;
+  setTimeout(() => el.className = '', 3500);
+}
+
+function formatDate(str) {
+  if (!str) return '—';
+  const d = new Date(str);
+  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) +
+    (str.includes('T') ? ' ' + d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) : '');
+}
+
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
